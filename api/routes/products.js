@@ -7,7 +7,7 @@ router.get('/', (req, res, next) => {
   Product.find()
     .exec()
     .then(docs => {
-      console.log('GET request: ' + docs);
+      console.log(docs);
       res.status(200).json(docs);
     })
     .catch(err => {
