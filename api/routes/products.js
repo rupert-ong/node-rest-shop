@@ -58,9 +58,26 @@ router.get('/:productId', (req, res, next) => {
 
 router.patch('/:productId', (req, res, next) => {
   const id = req.params.productId;
-  res.status(200).json({
-    message: `Handling PATCH request to /products/${id}`
-  });
+  const updateObj = {};
+  // Body JSON data in request must be an array of object [{"propName": "name", "value", "New Title"}]
+  /* for(const obj of req.body){
+    updateObj[obj.propName] = obj.value;
+  } */
+  for(const key in req.body){
+    updateObj[key] = req.body[key];
+  }
+  Product.update({ _id: id }, { $set: updateObj })
+    .exec()
+    .then(result => {
+      console.log(result);
+      res.status(200).json(result);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
 });
 
 router.delete('/:productId', (req, res, next) => {
