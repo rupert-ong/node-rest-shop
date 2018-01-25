@@ -119,8 +119,18 @@ router.delete('/:productId', (req, res, next) => {
   Product.remove({ _id: id })
     .exec()
     .then(result => {
-      console.log(result);
-      res.status(200).json(result);
+      res.status(200).json({
+        message: 'Product successfully deleted',
+        request: {
+          type: 'POST',
+          description: 'Create a product',
+          url: `http://localhost/${port}/products`,
+          body: {
+            name: 'String',
+            price: 'Number'
+          }
+        }
+      });
     })
     .catch(err => {
       console.log(err);
