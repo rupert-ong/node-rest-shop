@@ -8,6 +8,10 @@ const port = process.env.PORT || 3000;
 router.get('/', (req, res, next) => {
   Order.find()
     .select('product quantity _id')
+    // Allows us to query/get the matching Product document associated with the Order document
+    // 'product' refers to the reference property in the Orders Model
+    // 'product' will no longer just be the ObjectId, but the Product information :)
+    .populate('product', 'name')
     .exec()
     .then(docs => {
       const response = {
@@ -66,6 +70,8 @@ router.get('/:orderId', (req, res, next) => {
   const id = req.params.orderId;
   Order.findById(id)
     .select('product quantity _id')
+    // Populate product property with Product document information
+    .populate('product')
     .exec()
     .then(doc => {
       if (!doc) {
