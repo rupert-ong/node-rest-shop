@@ -2,12 +2,32 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Order = require('../models/order');
+const port = process.env.PORT || 3000;
 
 router.get('/', (req, res, next) => {
-  res.status(200).json({
-    message: 'Orders fetched'
-  });
-})
+  Order.find()
+    .select('product quantity _id')
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        orders: docs.map(doc => {
+          return {
+            ...doc._doc,
+            request: {
+              type: 'GET',
+              url: `http://localhost:${port}/orders/${doc._id}`
+            }
+          };
+        })
+      };
+      res.status(200).json(response);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
+});
 
 router.post('/', (req, res, next) => {
   const order = new Order({
