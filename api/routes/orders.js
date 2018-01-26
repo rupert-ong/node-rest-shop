@@ -47,17 +47,54 @@ router.post('/', (req, res, next) => {
 })
 
 router.get('/:orderId', (req, res, next) => {
-  res.status(200).json({
-    message: 'Order details',
-    orderId: req.params.orderId
-  });
+  const id = req.params.orderId;
+  Order.findById(id)
+    .select('product quantity _id')
+    .exec()
+    .then(doc => {
+      if (doc) {
+        res.status(200).json({
+          ...doc._doc,
+          request: {
+            type: 'GET',
+            description: 'Get all orders',
+            url: `http://localhost:${port}/orders`
+          }
+        });
+      } else {
+        res.status(404).json({
+          message: 'No valid order found'
+        });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
 });
 
 router.delete('/:orderId', (req, res, next) => {
-  res.status(200).json({
-    message: 'Order deleted',
-    orderId: req.params.orderId
-  });
+  const id = req.params.orderId;
+  Order.remove({ _id: id })
+    .exec()
+    .then(result => {
+      res.status(200).json({
+        message: 'Order successfully deleted',
+        request: {
+          type: 'POST',
+          description: 'Create an order',
+          url: `http://localhost:${port}/orders`,
+          body: {
+            product: 'String',
+            quantity: 'Number'
+          }
+        }
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
 });
 
 module.exports = router;
