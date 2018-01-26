@@ -23,10 +23,7 @@ router.get('/', (req, res, next) => {
       }
       res.status(200).json(response);
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+    .catch(err => { res.status(500).json({ error: err }); });
 });
 
 router.post('/', (req, res, next) => {
@@ -38,7 +35,7 @@ router.post('/', (req, res, next) => {
   product.save()
     .then(result => {
       res.status(201).json({
-        message: 'Created product successfully',
+        message: 'Created product',
         createdProduct: {
           name: result.name,
           price: result.price,
@@ -50,10 +47,7 @@ router.post('/', (req, res, next) => {
         }
       });
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+    .catch(err => { res.status(500).json({ error: err }); });
 });
 
 router.get('/:productId', (req, res, next) => {
@@ -62,25 +56,19 @@ router.get('/:productId', (req, res, next) => {
     .select('name price _id')
     .exec()
     .then(doc => {
-      if (doc) {
-        res.status(200).json({
-          ...doc._doc,
-          request: {
-            type: 'GET',
-            description: 'Get all products',
-            url: `http://localhost:${port}/products`
-          }
-        });
-      } else {
-        res.status(404).json({
-          message: 'No valid entry found'
-        });
+      if (!doc) {
+        return res.status(404).json({ message: 'Product not found' });
       }
+      res.status(200).json({
+        ...doc._doc,
+        request: {
+          type: 'GET',
+          description: 'Get all products',
+          url: `http://localhost:${port}/products`
+        }
+      });
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
+    .catch(err => { res.status(500).json({ error: err }); });
 });
 
 router.patch('/:productId', (req, res, next) => {
@@ -90,15 +78,14 @@ router.patch('/:productId', (req, res, next) => {
   /* for(const obj of req.body){
     updateObj[obj.propName] = obj.value;
   } */
-  for(const key in req.body){
+  for (const key in req.body) {
     updateObj[key] = req.body[key];
   }
   Product.update({ _id: id }, { $set: updateObj })
     .exec()
     .then(result => {
-      console.log(result);
       res.status(200).json({
-        message: 'Product successfully updated',
+        message: 'Product updated',
         request: {
           type: 'GET',
           description: 'Get single product',
@@ -106,12 +93,7 @@ router.patch('/:productId', (req, res, next) => {
         }
       });
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+    .catch(err => { res.status(500).json({ error: err }); });
 });
 
 router.delete('/:productId', (req, res, next) => {
@@ -120,7 +102,7 @@ router.delete('/:productId', (req, res, next) => {
     .exec()
     .then(result => {
       res.status(200).json({
-        message: 'Product successfully deleted',
+        message: 'Product deleted',
         request: {
           type: 'POST',
           description: 'Create a product',
@@ -132,12 +114,7 @@ router.delete('/:productId', (req, res, next) => {
         }
       });
     })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
+    .catch(err => { res.status(500).json({ error: err }); });
 });
 
 module.exports = router;
