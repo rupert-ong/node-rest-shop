@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Order = require('../models/order');
+const Product = require('../models/product');
 const port = process.env.PORT || 3000;
 
 router.get('/', (req, res, next) => {
@@ -30,12 +31,22 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-  const order = new Order({
-    _id: mongoose.Types.ObjectId(),
-    quantity: req.body.quantity,
-    product: req.body.productId
-  });
-  order.save()
+  Product.findById(req.body.productId)
+    .exec()
+    .then(product => {
+      if (!product) {
+        return res.status(404).json({
+          message: 'Product not found'
+        });
+      }
+      const order = new Order({
+        _id: mongoose.Types.ObjectId(),
+        quantity: req.body.quantity,
+        product: req.body.productId
+      });
+      // returns a promise
+      return order.save();
+    })
     .then(result => {
       console.log(result);
       res.status(201).json({
@@ -55,7 +66,7 @@ router.post('/', (req, res, next) => {
       console.log(err);
       res.status(500).json({ error: err });
     });
-})
+});
 
 router.get('/:orderId', (req, res, next) => {
   const id = req.params.orderId;
