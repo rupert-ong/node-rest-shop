@@ -29,7 +29,7 @@ const port = process.env.PORT || 3000;
 
 router.get('/', (req, res, next) => {
   Product.find()
-    .select('name price _id')
+    .select('name price _id productImage')
     .exec()
     .then(docs => {
       const response = {
@@ -54,7 +54,8 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
   const product = new Product({
     _id: mongoose.Types.ObjectId(),
     name: req.body.name,
-    price: req.body.price
+    price: req.body.price,
+    productImage: req.file.path
   });
   product.save()
     .then(result => {
@@ -77,7 +78,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
 router.get('/:productId', (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-    .select('name price _id')
+    .select('name price _id productImage')
     .exec()
     .then(doc => {
       if (!doc) {

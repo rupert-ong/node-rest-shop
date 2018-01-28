@@ -15,6 +15,7 @@ mongoose.connect(process.env.MONGO_DB_CONNECTION, {
 
 // Middleware
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
