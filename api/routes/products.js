@@ -1,6 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/')
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + file.originalname);
+  }
+});
+const upload = multer({storage: storage});
+
 const Product = require('../models/product');
 const port = process.env.PORT || 3000;
 
@@ -26,7 +38,8 @@ router.get('/', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('productImage'), (req, res, next) => {
+  console.log(req.file);
   const product = new Product({
     _id: mongoose.Types.ObjectId(),
     name: req.body.name,
