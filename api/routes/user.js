@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const User = require('../models/user');
+const port = process.env.PORT || 3000;
 
 router.post('/signup', (req, res, next) => {
   User.find({ email: req.body.email })
@@ -33,11 +34,31 @@ router.post('/signup', (req, res, next) => {
         });
       }
     })
-
 });
 
 router.post('/signout', (req, res, next) => {
 
 });
+
+router.delete('/:userId', (req, res, next) => {
+  const userId = req.params.userId;
+  User.remove({ _id: userId })
+    .exec()
+    .then(result => {
+      res.status(200).json({
+        message: 'User deleted',
+        request: {
+          type: 'POST',
+          description: 'Create user',
+          url: `http://localhost/${port}/user`,
+          body: {
+            email: 'String',
+            password: 'String'
+          }
+        }
+      });
+    })
+    .catch(err => { res.status(500).json({ error: err }); });
+})
 
 module.exports = router;
