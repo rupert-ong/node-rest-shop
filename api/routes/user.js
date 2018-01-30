@@ -36,6 +36,33 @@ router.post('/signup', (req, res, next) => {
     })
 });
 
+router.post('/login', (req, res, next) => {
+  User.findOne({ email: req.body.email })
+    .exec()
+    .then(user => {
+      if (!user) {
+        // Obfuscate fact that user doesn't exist for security reasons
+        return res.status(401).json({
+          message: 'Authentication failed'
+        });
+      }
+
+      // Check password by comparing the hashed entered password to the saved hashed password
+      bcrypt.compare(req.body.password, user.password, (err, result) => {
+        if (err) return res.status(401).json({ message: 'Authentication failed' });
+        if (result) {
+          return res.status(200).json({ message: 'Authentication successful'});
+        }
+        res.status(401).json({ message: 'Authentication failed' });
+      });
+
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
+});
+
 router.post('/signout', (req, res, next) => {
 
 });
