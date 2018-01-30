@@ -1,5 +1,6 @@
 {
   "env": {
-    "MONGO_DB_CONNECTION" : "yourDBConnection"
+    "MONGO_DB_CONNECTION" : "yourDBConnection",
+    "JWT_KEY" : "yourSecret"
   }
 }
