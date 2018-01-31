@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
+const checkAuth = require('../middleware/check-auth');
+
 // Multer (Image Upload) Config
 const multer = require('multer');
 const storage = multer.diskStorage({
@@ -49,7 +51,7 @@ router.get('/', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.post('/', upload.single('productImage'), (req, res, next) => {
+router.post('/', checkAuth, upload.single('productImage'), (req, res, next) => {
   console.log(req.file);
   const product = new Product({
     _id: mongoose.Types.ObjectId(),
@@ -96,7 +98,7 @@ router.get('/:productId', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.patch('/:productId', (req, res, next) => {
+router.patch('/:productId', checkAuth, (req, res, next) => {
   const id = req.params.productId;
   const updateObj = {};
   // Body JSON data in request must be an array of object [{"propName": "name", "value", "New Title"}]
@@ -121,7 +123,7 @@ router.patch('/:productId', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.delete('/:productId', (req, res, next) => {
+router.delete('/:productId', checkAuth, (req, res, next) => {
   const id = req.params.productId;
   Product.remove({ _id: id })
     .exec()
