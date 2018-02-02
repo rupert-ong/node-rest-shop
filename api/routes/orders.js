@@ -5,7 +5,9 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const port = process.env.PORT || 3000;
 
-router.get('/', (req, res, next) => {
+const checkAuth = require('../middleware/check-auth');
+
+router.get('/', checkAuth, (req, res, next) => {
   Order.find()
     .select('product quantity _id')
     // Allows us to query/get the matching Product document associated with the Order document
@@ -31,7 +33,7 @@ router.get('/', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
   Product.findById(req.body.productId)
     .exec()
     .then(product => {
@@ -66,7 +68,7 @@ router.post('/', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.get('/:orderId', (req, res, next) => {
+router.get('/:orderId', checkAuth, (req, res, next) => {
   const id = req.params.orderId;
   Order.findById(id)
     .select('product quantity _id')
@@ -89,7 +91,7 @@ router.get('/:orderId', (req, res, next) => {
     .catch(err => { res.status(500).json({ error: err }); });
 });
 
-router.delete('/:orderId', (req, res, next) => {
+router.delete('/:orderId', checkAuth, (req, res, next) => {
   const id = req.params.orderId;
   Order.remove({ _id: id })
     .exec()
